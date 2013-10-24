@@ -3,6 +3,8 @@
 """
 
 import os
+import itertools
+from ReverseComplement import *
 
 def KmerForLine(line, n):
     line_len = len(line)
@@ -14,12 +16,27 @@ def KmerForLine(line, n):
         except:
             kmerdict[kmer] = 1
     maximun = max(kmerdict.values())
-    bestkmerlist = []
-    for each in kmerdict:
-        if kmerdict[each] == maximun:
-            bestkmerlist.append(each)
-    #print "\t".join(bestkmerlist) 
+    bestkmerlist = [i for i,x in kmerdict.items() if x == maximun]
     return kmerdict
+
+def PatternGenerator( pattern_len ):
+    dna = ["A","T","C","G"]
+    for combine in itertools.combinations_with_replacement( dna, pattern_len ):
+        for order in itertools.permutations( combine, pattern_len):
+            yield "".join(order)
+
+def KmerFuzzy(Seq, k, d):
+    Seq_len = len(Seq)
+    kmerdict = dict()
+    for eachPattern in PatternGenerator(k):
+        if eachPattern in kmerdict:
+            continue
+        kmerdict[eachPattern] = len(PatternMatching(Seq, eachPattern, d))
+    print Seq
+    maximun = max(kmerdict.values())
+    bestkmerlist = [i for i,x in kmerdict.items() if x == maximun]
+    print " ".join(bestkmerlist)
+
 
 def KmerDictUpdate(ori_kmer_dict, new_kmer_dict):
     for each in new_kmer_dict:
@@ -28,7 +45,6 @@ def KmerDictUpdate(ori_kmer_dict, new_kmer_dict):
         except:
             ori_kmer_dict[each] = new_kmer_dict[each]
     return ori_kmer_dict
-
 
 def ClumpFind(Seq, n, L, t):
     seq_len = len(Seq)
@@ -82,6 +98,43 @@ def main2():
     print k,L,t
     ClumpFind(seq, k, L, t)
 
+def mainKF():
+    '''
+    # test case
+    # 1 test pattern generator
+    seq = "ACGTTGCATGTCGCATGATGCATGAGAGCT"
+    k = 4
+    d = 1
+    KmerFuzzy(seq, k, d)
+    '''
+    infile = "/home/jing/Downloads/dataset_8_4.txt.txt"
+    content = open(infile).readlines()
+    seq, k, d = content[0].split()
+    k = int(k)
+    d.strip()
+    d = int(d)
+    KmerFuzzy(seq, k, d)
+
+def mainKFReverse():
+    '''
+    # test case
+    # 1 test pattern generator
+    seq = "ACGTTGCATGTCGCATGATGCATGAGAGCT"
+    k = 4
+    d = 1
+    KmerFuzzy(seq, k, d)
+    '''
+    infile = "/home/jing/Downloads/dataset_8_5.txt.txt"
+    content = open(infile).readlines()
+    seq = content[0].strip()
+    k, d = content[1].strip().split()
+    k = int(k)
+    d = int(d)
+    print seq, k, d
+    KmerFuzzy(seq, k, d)
+
 if __name__ == "__main__":
     #main()
-    main2()
+    #main2()
+    #mainKF()
+    mainKFReverse()

@@ -4,12 +4,12 @@
 
 from string import maketrans
 
-def ReverseComplement(Seq):
+def ReverseComplement(seq):
     ori = "ATCG"
     trans = "TAGC"
     trantab = maketrans(ori, trans)
-    Seq.translate(trantab)
-    return Seq[::-1]
+    new_seq = seq.translate(trantab)
+    return new_seq[::-1]
 
 def FuzzyMatching(Seq1, Seq2, t):
     ## for normal matching
@@ -26,17 +26,20 @@ def FuzzyMatching(Seq1, Seq2, t):
     return True
 
 def PatternMatching(Seq, pattern, t):
+    ## add another function for reverse complementary
     seq_len = len(Seq)
     pat_len = len(pattern)
     index_list = []
     for i in range(seq_len - pat_len + 1):
         if FuzzyMatching(Seq[i:i + pat_len], pattern, t):
             index_list.append(i)
-    print " ".join(map(str,index_list))
+        if FuzzyMatching(Seq[i:i + pat_len], ReverseComplement(pattern), t):
+            index_list.append(i)
+    #print " ".join(map(str,index_list))
     return index_list
 
 def main():
-    infile = "/home/jing/Downloads/stepic_dataset.txt"
+    infile = "/home/jing/Downloads/dataset_3_2.txt.txt"
     seq = "AAAACCCGGT"
     for each in open(infile):
         seq = each.strip()
@@ -68,6 +71,6 @@ def mainFZPM():
 
 
 if __name__ == "__main__":
-    #main()
+    main()
     #mainPM()
-    mainFZPM()
+    #mainFZPM()
