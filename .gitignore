@@ -36,6 +36,13 @@ nosetests.xml
 .pydevproject
 
 # Byproduct of program
-.png
-.pdf
-.txt
+*.png
+*.jpg
+*.pdf
+*.txt
+
+# Editor buffer file
+*.py.swp
+
+# file not important
+tmp
