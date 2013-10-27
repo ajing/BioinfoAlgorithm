@@ -32,11 +32,11 @@ def KmerFuzzy(Seq, k, d):
         if eachPattern in kmerdict:
             continue
         kmerdict[eachPattern] = len(PatternMatching(Seq, eachPattern, d))
-    print Seq
+    #print Seq
     maximun = max(kmerdict.values())
     bestkmerlist = [i for i,x in kmerdict.items() if x == maximun]
-    print " ".join(bestkmerlist)
-
+    #print " ".join(bestkmerlist)
+    return kmerdict
 
 def KmerDictUpdate(ori_kmer_dict, new_kmer_dict):
     for each in new_kmer_dict:
