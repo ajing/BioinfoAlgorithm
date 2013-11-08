@@ -1,4 +1,0 @@
-BioinfoAlgorithm
-================
-
-Algorithms for Bioinformatics

@@ -47,7 +47,7 @@ def SeqStat():
     # total length of sequence
     N = 500
     # number of random times
-    rand_num = 1000
+    rand_num = 1
     for n in range(2, 5):
         # n is the size of pattern
         percent_matrix = np.zeros( (rand_num, 4**n) )
