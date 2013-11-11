@@ -39,7 +39,6 @@ nosetests.xml
 *.png
 *.jpg
 *.pdf
-*.txt
 
 # Editor buffer file
 *.py.swp

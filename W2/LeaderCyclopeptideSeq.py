@@ -37,42 +37,49 @@ def ReturnScoreList(peptidelist, spectrum):
 def Cut(leaderboard, spectrum, topN):
     # returns the top N highest-scoring peptides in Leaderboard (including ties) with respect to Spectrum.
     leaderboard_sort = sorted(leaderboard, key = lambda k: Score(k, spectrum), reverse = True)
-    scorelist          = ReturnScoreList(leaderboard_sort, spectrum)
-    last_element_index = TopNIndexfromList(scorelist, topN)
+    scorelist          = map( Score, leaderboard)
+    last_element_index = TopNIndexfromList(sorted(scorelist), topN)
     return leaderboard_sort[:(last_element_index + 1)]
 
 def LeaderCyclopeptideSequencing(spectrum_list, TopN):
     # clean spectrum_list
+    spectrum_list = sorted(spectrum_list)
     LeaderBoard   = [0]
     LeaderPeptide = []
+    LeaderScore   = 0
+    Parent_Mass   = ParentMass(spectrum_list)
     while LeaderBoard:
-    #for i in range(2):
         LeaderBoard = Expand(LeaderBoard)
         LeaderBoard_new = []
         for peptide in LeaderBoard:
-            if Mass(peptide) == ParentMass(spectrum_list):
-                if Score(peptide, spectrum_list) > Score(LeaderPeptide, spectrum_list):
+            if Mass(peptide) == Parent_Mass:
+                if Score(peptide, spectrum_list) > LeaderScore:
                     LeaderPeptide = peptide
-            if Mass(peptide) <= ParentMass(spectrum_list):
+                    LeaderScore   = Score(LeaderPeptide, spectrum_list)
+            if Mass(peptide) <= Parent_Mass:
                 LeaderBoard_new.append(peptide)
-        #print "before cut", ReturnScoreList(LeaderBoard_new, spectrum_list)
         LeaderBoard_new = Cut(LeaderBoard_new, spectrum_list, TopN)
-        #print "after cut", ReturnScoreList(LeaderBoard_new, spectrum_list)
-        #print "3:", ReturnScoreList(LeaderBoard_new, spectrum_list).count(3)
-        #print len(LeaderBoard_new)
         LeaderBoard = LeaderBoard_new
     return LeaderPeptide
 
+def SampleTest():
+    # Test for Score()
+    print Score([0,1,1],[0,1,1,1,2])
+    #assert(Score([0,1,1],[0,1,1,1,2]) == 3)
+    spectrum = "0 71 113 129 147 200 218 260 313 331 347 389 460".split()
+    spectrum = map(int, spectrum)
+    N = 10
+    leaderpeptide = LeaderCyclopeptideSequencing(spectrum, N)
+    print "-".join(map(str, leaderpeptide))
+
 if __name__ == "__main__":
+    '''
+    SampleTest()
+    '''
     infile = "/home/ajing/Downloads/dataset_24_4.txt"
-    for x in open(infile).readlines():
-        print x
     N, spectrum = [ x.strip() for x in open(infile).readlines()]
     N        = int(N)
-    #N        = 10
-    #spectrum = "0 71 113 129 147 200 218 260 313 331 347 389 460"
     spectrum = map(int, spectrum.split())
-    peptide = [156, 71, 113, 114, 131, 156, 113, 101, 129, 128, 128, 114, 128, 103, 97, 131, 131, 113, 131, 113, 128, 115, 128, 113]
     leaderpeptide = LeaderCyclopeptideSequencing(spectrum, N)
-    print leaderpeptide
+    print "-".join(map(str, leaderpeptide))
     print len(leaderpeptide)

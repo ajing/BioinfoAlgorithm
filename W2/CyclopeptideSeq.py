@@ -48,9 +48,7 @@ def AllPossibleSubPeptideLinear( peptide ):
 
 def Linearspectrum(aacid_mass_list):
     mass_combine = AllPossibleSubPeptideLinear(aacid_mass_list)
-    mass_combine = [x for x in mass_combine]
     mass_sum     = [sum(x) for x in mass_combine]
-    mass_sum     = list(set(mass_sum))
     return sorted(mass_sum)
 
 def Consistent(masslist, spectrum):
@@ -60,14 +58,10 @@ def Consistent(masslist, spectrum):
             return False
     return True
 
-def MassEqual(spectrum1, spectrum2):
-    pass
-
 def Cyclospectrum(aacid_mass_list):
     mass_combine = AllPossibleSubPeptide(aacid_mass_list)
-    mass_combine = [x for x in mass_combine]
+    #mass_combine = [x for x in mass_combine if x]
     mass_sum     = [sum(x) for x in mass_combine]
-    mass_sum     = list(set(mass_sum))
     return sorted(mass_sum)
 
 def CyclopeptideSequencing(spectrum_list):
