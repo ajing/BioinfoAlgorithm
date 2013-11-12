@@ -49,7 +49,7 @@ def AllPossibleSubPeptideLinear( peptide ):
 def Linearspectrum(aacid_mass_list):
     mass_combine = AllPossibleSubPeptideLinear(aacid_mass_list)
     mass_sum     = [sum(x) for x in mass_combine]
-    return sorted(mass_sum)
+    return mass_sum
 
 def Consistent(masslist, spectrum):
     mass_spectrum = Linearspectrum(masslist)
