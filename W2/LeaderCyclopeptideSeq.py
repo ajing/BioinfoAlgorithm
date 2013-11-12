@@ -4,30 +4,6 @@
 '''
 # rewrite function in numpy so quicker functions
 from CyclopeptideSeq import *
-'''
-import numpy as np
-def SubPeptideMass( peptide, length ):
-    # peptide is a numpy array
-    if len(peptide) == length:
-        return [np.sum(peptide)]
-    masslist = []
-    pep_len  = len(peptide)
-    for i in range(pep_len):
-        mass = np.sum(np.roll(peptide, i)[:length])
-        masslist.append(mass)
-    return masslist
-
-def AllPossibleSubMass( peptide ):
-    pep_len = len(peptide)
-    all_possible = [0]
-    for i in range(1, pep_len + 1):
-        all_possible += SubPeptideMass(peptide, i)
-    return all_possible
-
-def Cyclospectrum(aacid_mass_list):
-    mass_sum = AllPossibleSubMass(aacid_mass_list)
-    return sorted(mass_sum)
-'''
 
 def Mass(peptide):
     return sum(peptide)
@@ -38,7 +14,7 @@ def ParentMass(spectrum):
 def Score(peptide, spectrum):
     score = 0
     spect_copy = list(spectrum)
-    pep_spect  = Linearspectrum(peptide)
+    pep_spect  = Cyclospectrum(peptide)
     for amino_acid in pep_spect:
         if amino_acid in spect_copy:
             score += 1
@@ -74,7 +50,27 @@ def Cut(leaderboard, spectrum, topN):
     last_element_index = TopNIndexfromList(scorelist_sort, topN)
     return leaderboard_sort[:(last_element_index + 1)]
 
-def LeaderCyclopeptideSequencing(spectrum_list, TopN):
+def Expand(candlist, masslist = None):
+    # candlist is a list of amino acids mass candidate list
+    # like [[1,3,2], [4,2,1]]
+    if masslist is None:
+        masslist = MASSLIST
+    new_list = []
+    if candlist == [0]:
+        for eachmass in masslist:
+            new_list.append([eachmass])
+        return new_list
+    for each in candlist:
+        for eachmass in masslist:
+            newitem = [eachmass] + each
+            if not newitem in new_list:
+                new_list.append(newitem)
+            newitem = each + [eachmass]
+            if not newitem in new_list:
+                new_list.append(newitem)
+    return new_list
+
+def LeaderCyclopeptideSequencing(spectrum_list, TopN, masslist = None):
     # clean spectrum_list
     spectrum_list = sorted(spectrum_list)
     LeaderBoard   = [0]
@@ -82,7 +78,7 @@ def LeaderCyclopeptideSequencing(spectrum_list, TopN):
     LeaderScore   = 0
     Parent_Mass   = ParentMass(spectrum_list)
     while LeaderBoard:
-        LeaderBoard = Expand(LeaderBoard)
+        LeaderBoard = Expand(LeaderBoard, masslist)
         LeaderBoard_new = []
         for peptide in LeaderBoard:
             if Mass(peptide) == Parent_Mass:
@@ -100,6 +96,8 @@ def SampleTest():
     peptide = "113-71-71-71-71-129".split("-")
     peptide = map(int, peptide)
     print Cyclospectrum(peptide)
+    ref = "0 113 71 71 71 71 129 184 142 142 142 200 242 255 213 271 313 313 326 284 342 384 384 384 397 413 455 455 455 455 526".split()
+    print sorted(map(int, ref))
     # reference 0 113 71 71 71 71 129 184 142 142 142 200 242 255 213 271 313 313 326 284 342 384 384 384 397 413 455 455 455 455 526
     # Test for Score()
     print Score([0,1,1],[0,1,1,1,2])
@@ -113,7 +111,6 @@ def SampleTest():
     '''
 
 if __name__ == "__main__":
-    '''
     SampleTest()
     '''
     infile = "/home/ajing/Downloads/dataset_24_4.txt"
@@ -124,3 +121,4 @@ if __name__ == "__main__":
     leaderpeptide = LeaderCyclopeptideSequencing(spectrum, N)
     print "-".join(map(str, leaderpeptide))
     print len(leaderpeptide)
+    '''
