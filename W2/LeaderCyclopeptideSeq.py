@@ -2,7 +2,31 @@
     LeaderBoardCyclopeptideSequencing
     Input: Integer N and a collection of integers Spectrum.
 '''
+# rewrite function in numpy so quicker functions
 from CyclopeptideSeq import *
+import numpy as np
+
+def SubPeptideMass( peptide, length ):
+    # peptide is a numpy array
+    if len(peptide) == length:
+        return [np.sum(peptide)]
+    masslist = []
+    pep_len  = len(peptide)
+    for i in range(pep_len):
+        sum = np.sum(np.roll(peptide, i)[:length])
+        masslist.append(sum)
+    return masslist
+
+def AllPossibleSubMass( peptide ):
+    pep_len = len(peptide)
+    all_possible = [0]
+    for i in range(1, pep_len + 1):
+        all_possible += SubPeptideMass(peptide, i)
+    return all_possible
+
+def Cyclospectrum(aacid_mass_list):
+    mass_sum = AllPossibleSubMass(aacid_mass_list)
+    return sorted(mass_sum)
 
 def Mass(peptide):
     return sum(peptide)
@@ -21,12 +45,14 @@ def Score(peptide, spectrum):
 
 def TopNIndexfromList(alist, topN):
     # top N from a sorted list including ties
-    if topN > len(alist):
-        return len(alist)
+    alist_len = len(alist)
+    if topN > alist_len:
+        return alist_len
     elementN = alist[topN-1]
-    alist_rev = alist[::-1]
-    lastelementN = len(alist) - alist_rev.index(elementN)
-    return lastelementN
+    for each in range(topN - 1, alist_len):
+        if alist[each] != elementN:
+            break
+    return each
 
 def ReturnScoreList(peptidelist, spectrum):
     scorelist = []
@@ -37,8 +63,8 @@ def ReturnScoreList(peptidelist, spectrum):
 def Cut(leaderboard, spectrum, topN):
     # returns the top N highest-scoring peptides in Leaderboard (including ties) with respect to Spectrum.
     leaderboard_sort = sorted(leaderboard, key = lambda k: Score(k, spectrum), reverse = True)
-    scorelist          = map( Score, leaderboard)
-    last_element_index = TopNIndexfromList(sorted(scorelist), topN)
+    scorelist          = ReturnScoreList(leaderboard_sort, spectrum)
+    last_element_index = TopNIndexfromList(scorelist, topN)
     return leaderboard_sort[:(last_element_index + 1)]
 
 def LeaderCyclopeptideSequencing(spectrum_list, TopN):
@@ -63,6 +89,10 @@ def LeaderCyclopeptideSequencing(spectrum_list, TopN):
     return LeaderPeptide
 
 def SampleTest():
+    # Test for Cyclospectrum
+    peptide = "113-71-71-71-71-129".split("-")
+    peptide = map(int, peptide)
+    print Cyclospectrum(peptide)
     # Test for Score()
     print Score([0,1,1],[0,1,1,1,2])
     #assert(Score([0,1,1],[0,1,1,1,2]) == 3)
@@ -77,6 +107,7 @@ if __name__ == "__main__":
     SampleTest()
     '''
     infile = "/home/ajing/Downloads/dataset_24_4.txt"
+    infile = "input.txt"
     N, spectrum = [ x.strip() for x in open(infile).readlines()]
     N        = int(N)
     spectrum = map(int, spectrum.split())
