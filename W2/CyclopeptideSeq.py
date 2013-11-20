@@ -60,6 +60,7 @@ def Consistent(masslist, spectrum):
 
 def Cyclospectrum(aacid_mass_list):
     mass_combine = AllPossibleSubPeptide(aacid_mass_list)
+    #print mass_combine
     #mass_combine = [x for x in mass_combine if x]
     mass_sum     = [sum(x) for x in mass_combine]
     return sorted(mass_sum)

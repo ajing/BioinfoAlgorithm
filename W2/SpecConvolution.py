@@ -18,6 +18,7 @@ if __name__ == "__main__":
     infile = "input.txt"
     listint = [0, 137, 186, 323]
     listint = open(infile).readlines()[0].strip().split()
+    listint = "57 57 71 99 129 137 170 186 194 208 228 265 285 299 307 323 356 364 394 422 493".split()
     listint = map(int, listint)
     convollist = Convolution(listint)
     print len(convollist)
