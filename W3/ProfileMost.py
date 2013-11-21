@@ -14,11 +14,16 @@ def Prob(motif, amino_index, matrix):
 def ProfileMost(seq, k, amino_index, matrix):
     seq_len   = len(seq)
     prob_dict = dict()
+    min_prob  = 0
+    min_motif = seq[:k]
     for i in range(seq_len - k + 1):
         motif = seq[i:i + k]
-        prob_dict[motif] = Prob(motif, amino_index, matrix)
-    minval = max(prob_dict, key = prob_dict.get)
-    print minval, prob_dict[minval]
+        prob  = Prob(motif, amino_index, matrix)
+        if prob > min_prob:
+            min_motif = motif
+            min_prob  = prob
+    #print minval, prob_dict[minval]
+    return min_motif
 
 if __name__ == "__main__":
     infile  = "/home/ajing/Downloads/dataset_39_3.txt"
