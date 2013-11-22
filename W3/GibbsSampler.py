@@ -56,7 +56,7 @@ def GibbsSampler(dna_list, k, t, N):
 
 def Runs1000Times(dna_list, k, t, N):
     best_score = 10000
-    for i in range(40):
+    for i in range(100):
         motifs, score = GibbsSampler(dna_list, k, t, N)
         if score < best_score:
             best_motifs = motifs
@@ -74,8 +74,10 @@ if __name__ == "__main__":
     test()
     '''
     infile  = "/home/ajing/Downloads/dataset_43_4.txt"
+    infile  = "/home/ajing/Downloads/dataset_41_4.txt"
     content = [line.strip() for line in open(infile).readlines()]
-    k, t, N   = [int(x) for x in content[0].split()]
+    k, t   = [int(x) for x in content[0].split()]
+    N      = 2000
     seqs    = content[1:]
     print k, t, N, seqs
     motifs  = Runs1000Times(seqs, k, t, N)
