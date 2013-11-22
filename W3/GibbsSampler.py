@@ -4,6 +4,7 @@
 '''
 from RandomMotif import *
 from RandomMotif import _AMINO_INDEX_
+from ProfileMost import Prob
 
 import random
 import bisect
@@ -26,7 +27,7 @@ def ProfileRandom(dna, k, amino_index, profile):
         idx=bisect.bisect(cdf_vals,x)
         return population[idx]
 
-    dna_len   = len(seq)
+    dna_len   = len(dna)
     motifs    = []
     weights   = []
     for i in range(dna_len - k + 1):
@@ -40,35 +41,45 @@ def ProfileRandom(dna, k, amino_index, profile):
 def GibbsSampler(dna_list, k, t, N):
     # t: number of sequence
     motifs = RandomizedMotifList(dna_list, k)
-    best_score = 1000
-    N = 100000
+    best_score = 10000
     for i in range(N):
-        i = randint(0,t - 1)
-        new_motifs = motifs[:i] + motifs[(i + 1):]
+        j = randint(0,t - 1)
+        new_motifs = motifs[:j] + motifs[(j + 1):]
         profile = BuildProfilePseudo(new_motifs)
         #print profile
-        motifs[i] = ProfileMost(dna_list[i], k, _AMINO_INDEX_, profile)
+        motifs[j] = ProfileRandom(dna_list[j], k, _AMINO_INDEX_, profile)
         score     = ScoreMotifs(motifs)
         if score < best_score:
-            best_motifs = motifs
+            best_motifs = motifs[:]
             best_score  = score
-    return best_motifs
+    return best_motifs, best_score
 
 def Runs1000Times(dna_list, k, t, N):
-    best_score = 1000
-    for i in range(2000):
-        motifs = GibbsSampler(dna_list, k, t, N)
-        if ScoreMotifs(motifs) < best_score:
+    best_score = 10000
+    for i in range(40):
+        motifs, score = GibbsSampler(dna_list, k, t, N)
+        if score < best_score:
             best_motifs = motifs
-            best_score = ScoreMotifs(motifs)
+            best_score  =  score
     print best_score
     return best_motifs
 
+def test():
+    seq = "TACGCA"
+    profile = [[0, 0.5, 0, 0.5],[1, 0, 0, 0]]
+    print ProfileRandom(seq, 2, _AMINO_INDEX_, profile)
 
 if __name__ == "__main__":
-    infile  = "/home/ajing/Downloads/dataset_40_9.txt"
+    '''
+    test()
+    '''
+    infile  = "/home/ajing/Downloads/dataset_43_4.txt"
     content = [line.strip() for line in open(infile).readlines()]
-    k, t, N    = [int(x) for x in content[0].split()]
+    k, t, N   = [int(x) for x in content[0].split()]
     seqs    = content[1:]
     print k, t, N, seqs
-    #print "\n".join(Runs1000Times(seqs, k, t, N))
+    motifs  = Runs1000Times(seqs, k, t, N)
+    print "\n".join(motifs)
+    print ScoreMotifs(motifs)
+    motifs  = ['TCTCGGGG', 'CCAAGGTG', 'TACAGGCG', 'TTCAGGTG', 'TCCACGTG']
+    print ScoreMotifs(motifs)

@@ -32,14 +32,14 @@ def RandomizedMotifSearch(dna_list, k, t):
         motifs  = MotifsBuildfromProfile(dna_list, k, profile)
         score   = ScoreMotifs(motifs)
         if score < best_score:
-            best_motifs = motifs
+            best_motifs = motifs[:]
             best_score  = score
         else:
             return best_motifs
 
 def Runs1000Times(dna_list, k, t):
     best_score = 1000
-    for i in range(2000):
+    for i in range(1000):
         motifs = RandomizedMotifSearch(dna_list, k, t)
         if ScoreMotifs(motifs) < best_score:
             best_motifs = motifs
