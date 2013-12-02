@@ -3,7 +3,6 @@
      Output: DeBruijnk(Text).
 '''
 from StringComp import StringComp
-from OverlapGraph import GraphOverlap
 from collections import defaultdict
 
 def SimpList(adjlist):
