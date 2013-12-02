@@ -49,7 +49,6 @@ def AvailNodes(cycle, unused_edges):
 def RearrangeCycle(cycle, index):
     return cycle[index:] + cycle[:index]
 
-
 def EulerianCyc(de_graph):
     # debruijn graph is a dictionary
     rand_start    = choice(de_graph.keys())
