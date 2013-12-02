@@ -12,6 +12,7 @@ def SimpList(adjlist):
     return collapse_dict
 
 def DeBruijnk(seq, N):
+    # return adjacency list of the de Bruijn graph DeBruijn(Patterns) from sequence.
     motif_list    = StringComp(seq, N - 1)
     adj_list      = zip(motif_list[:-1], motif_list[1:])
     collapse_dict = SimpList(adj_list)
@@ -34,6 +35,7 @@ def DeBruijn_main():
     PrintDict(DeBruijnk(Seq, N))
 
 def DeBruijnKmer(seqs):
+    # return adjacency list of the de Bruijn graph DeBruijn(Patterns) from kmers.
     adj_list = []
     for eachseq in seqs:
         adj_list.append([eachseq[:-1], eachseq[1:]])
