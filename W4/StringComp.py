@@ -5,11 +5,9 @@
 
 def StringComp(astring, N):
     string_len  = len(astring)
-    print string_len
     string_list = []
     for i in range(string_len - N + 1):
         string_list.append(astring[i:i + N])
-    string_list.sort()
     return string_list
 
 if __name__ == "__main__":
@@ -19,4 +17,5 @@ if __name__ == "__main__":
     N       = int(content[0])
     Seq     = content[1]
     print N, Seq
-    StringComp(Seq, N)
+    astring = StringComp(Seq, N).sort()
+    print astring
