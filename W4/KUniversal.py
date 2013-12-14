@@ -16,7 +16,7 @@ def StringsGen(N):
 
 
 if __name__ == "__main__":
-    seqs  = StringsGen(16)
+    seqs  = StringsGen(18)
     graph = DeBruijnKmer(seqs)
     circle = EulerianCyc(graph)
     pathlist = [x[-1] for x in circle]
