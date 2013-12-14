@@ -6,6 +6,7 @@
 from DeBruijn import DeBruijnKmer
 from EulerianCyc import EulerianCyc
 from EulerianPath import JoinPathtoString
+import sys
 
 def StringsGen(N):
     s_list = []
@@ -16,7 +17,9 @@ def StringsGen(N):
 
 
 if __name__ == "__main__":
-    seqs  = StringsGen(18)
+    num   = int(sys.argv[1])
+    print num
+    seqs  = StringsGen(21)
     graph = DeBruijnKmer(seqs)
     circle = EulerianCyc(graph)
     pathlist = [x[-1] for x in circle]
