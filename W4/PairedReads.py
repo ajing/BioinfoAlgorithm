@@ -4,6 +4,9 @@
     Output: A string Text with (k, d)-mer composition equal to PairedReads.
 '''
 
+from EulerianPath import EulerianPath, JoinPathtoString
+from DeBruijn import DeBruijnKmer
+
 class PReads:
     def __init__(self, left, right):
         self.left = left
@@ -22,8 +25,33 @@ def PReadsParser(seqs):
 def PairedReads(seqs, d):
     # node_dict is mapping from number to PReads class
     graph, node_dict = PReadsParser(seqs)
-    EulerianPath
+    #EulerianPath
     pass
+
+def EulerianString(seqs):
+    graph = DeBruijnKmer(seqs)
+    path  = EulerianPath(graph)
+    return JoinPathtoString(path)
+
+def PairedCheating(seqs_start, seqs_end, d):
+    # This is a cheating way to find the right sequence
+    print EulerianString(seqs_start)
+    print EulerianString(seqs_end)
+
+def PairfileParser(infile):
+    flag = 1
+    startseqs = []
+    endseqs = []
+    for line in open(infile):
+        content = line.strip()
+        if flag:
+            d = int(content)
+            flag = 0
+            continue
+        start, end = content.split("|")
+        startseqs.append(start)
+        endseqs.append(end)
+    return d, startseqs, endseqs
 
 def TestClass():
     first = PReads("A","C")
@@ -32,6 +60,8 @@ def TestClass():
     print hash(first)
     print hash(second)
     print hash(third)
+    d, start, end = PairfileParser("tmp")
+    PairedCheating(start, end, d)
 
 if __name__ == "__main__":
     TestClass()

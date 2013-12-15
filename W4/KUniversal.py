@@ -19,8 +19,9 @@ def StringsGen(N):
 if __name__ == "__main__":
     num   = int(sys.argv[1])
     print num
-    seqs  = StringsGen(21)
+    seqs  = StringsGen(num)
     graph = DeBruijnKmer(seqs)
+    print graph
     circle = EulerianCyc(graph)
     pathlist = [x[-1] for x in circle]
     print "".join(pathlist)

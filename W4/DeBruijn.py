@@ -6,6 +6,7 @@ from StringComp import StringComp
 from collections import defaultdict
 
 def SimpList(adjlist):
+    # using defaultdict here because, I don't need to initialize the dictionary as a empty list
     collapse_dict = defaultdict(list)
     for start, end in adjlist:
         collapse_dict[start].append(end)

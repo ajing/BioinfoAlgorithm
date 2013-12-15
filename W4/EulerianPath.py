@@ -34,6 +34,7 @@ def JoinPathtoString(path):
     return path[0][:-1] + "".join(partlist)
 
 def EulerianPath(graph):
+    print graph
     start, end = FindStartEnd(graph)
     # make debruijn graph for graph
     if end in graph:

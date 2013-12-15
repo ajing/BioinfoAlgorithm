@@ -51,6 +51,7 @@ def RearrangeCycle(cycle, index):
 
 def EulerianCyc(de_graph):
     # debruijn graph is a dictionary
+    # graph is a debruijn dictionary
     rand_start    = choice(de_graph.keys())
     current_cycle = RandomWalk(de_graph, rand_start)
     unused_edges  = EdgesFromGraph(de_graph)
