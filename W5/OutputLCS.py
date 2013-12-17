@@ -1,4 +1,5 @@
 '''
+Longest common subsequence problem
 Use OUTPUTLCS (reproduced below) to solve the Longest Common Subsequence Problem.
      Input: Two strings s and t.
      Output: A longest common subsequence of s and t.
