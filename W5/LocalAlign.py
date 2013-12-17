@@ -1,28 +1,12 @@
 '''
-   Solve the Global Alignment Problem.
-   Input: Two protein strings written in the single-letter amino acid alphabet.
-   Output: The maximum alignment score of these strings followed by an alignment achieving this maximum score. Use the BLOSUM62 scoring matrix and indel penalty 5
+Solve the Local Alignment Problem.
+    Input: Two protein strings written in the single-letter amino acid alphabet.
+    Output: The maximum score of a local alignment of the strings, followed by a local alignment of these strings achieving the maximum score. Use the PAM250 scoring matrix and indel penalty 5
 '''
-import numpy as np
 
-gap_score = 5
-BLOSUM = "BLOSUM62.txt"
+from GlobalAlign import *
 
-def ParseMatrix(infile):
-    dmatrix = dict()
-    flag  = 1  #first line flag
-    i     = 0
-    for line in open(infile):
-        content = line.strip().split()
-        if flag:
-            colnames = content
-            flag = 0
-            continue
-        rowname = colnames[i]
-        for j in range(len(colnames)):
-            dmatrix[rowname, colnames[j]] = int(content[j+1])
-        i += 1
-    return dmatrix
+PAM = "PAM250_1.txt"
 
 def MaxScore(v, w, i, j, score, dmatrix, backtrack):
     maxscore = -1000
@@ -40,21 +24,15 @@ def MaxScore(v, w, i, j, score, dmatrix, backtrack):
     if newscore > maxscore:
         backtrack[i, j] = 3
         maxscore = newscore
+    if maxscore < 0:
+        maxscore = 0
+        backtrack[i, j] = 4
     return maxscore
 
-def ScoreInitialize(score):
-    # add penalty score for each side
-    rownum, colnum = score.shape
-    for i in range(rownum):
-        score[i, 0] = - i * gap_score
-    for j in range(colnum):
-        score[0, j] = - j * gap_score
-
-def PrintBacktrack(backtrack, v, w):
-    i = len(v)
-    j = len(w)
+def PrintBacktrack(score, backtrack, v, w):
     matchlist = []
-    while i > 0 or j > 0:
+    i, j = np.unravel_index(score.argmax(), score.shape)
+    while (i > 0 or j > 0) and score[i, j] > 0:
         if backtrack[i, j] == 3:
             matchlist.append([v[i - 1], w[j - 1]])
             i -= 1
@@ -74,30 +52,28 @@ def PrintBacktrack(backtrack, v, w):
     print "".join(firstline)
     print "".join(secondline)
 
-
-def GlobalAlign(v, w):
+def LocalAlign(v, w):
     # v and w are two sequences
     v_len = len(v)
     w_len = len(w)
     score = np.zeros([v_len + 1, w_len + 1])
-    ScoreInitialize(score)
     # 1 is | (down); 2 is -> left; 3 is \ diag
     backtrack = np.zeros([v_len + 1, w_len + 1])
-    dmatrix = ParseMatrix(BLOSUM)
+    dmatrix = ParseMatrix(PAM)
     for i in range(1, 1 + v_len):
         for j in range(1, 1 + w_len):
             score[i, j] = MaxScore(v, w, i, j, score, dmatrix, backtrack)
-    print int(score[v_len, w_len])
-    print score
-    PrintBacktrack(backtrack, v, w)
+    print int(np.amax(score))
+    PrintBacktrack(score, backtrack, v, w)
+
 
 if __name__ == "__main__":
-    v = "PLEASANTLY"
-    w = "MEANLY"
-    #v = "TNIYGLKERVPR"
-    #w = "TNNMQTRMWCVLIAAPCHLW"
-    infile  = "/home/ajing/Downloads/dataset_76_3.txt"
+    w = "PENALTY"
+    v = "MEANLY"
+    #v = "GCCGCCGTCGTTTTCAGCAGTTATGTCAGAT"
+    #w = "GCCCAGTTATGTCAGGGGGCACGAGCATGCACA"
+    #v  = "VPYRVWGCCPMGCLHMGEDSHAETAAFCVAWDCTSICKTTYSTTRYSGAGLAMLYMRWSFDPDWAGSHFWMFCQVDRYMHNQYNLSCSDHMYRNHCDPAIQDVGRTLK"
+    #w  = "QKEVFEHHAYHNVSNIMYMLFTAFPRRCNLFSNWRIDYPENDRERRLGTFFESWREFDRQYKNWIMLNMVWYAKWQSHYKPGQQDCGITMNV"
+    infile  = "/home/ajing/Downloads/dataset_76_9.txt"
     v, w = [ x.strip() for x in open(infile).readlines() ]
-    #print v
-    #print w
-    GlobalAlign(v, w)
+    LocalAlign(v, w)
