@@ -34,8 +34,7 @@ def NoIncommingNodes(graph):
 
 def TopologicalSorting(graph):
     # follow the schema on wiki
-    graph_c = copy.copy(graph)
-    print dir(graph)
+    graph_c = copy.deepcopy(graph)
     L = []
     S = NoIncommingNodes(graph_c)
     while S:
@@ -46,7 +45,6 @@ def TopologicalSorting(graph):
             graph_c[(m, "in")].remove(n)
             if not graph_c[(m, "in")]:
                 S.append(m)
-    print "after running:", graph
     return L
 
 def Initialize(graph, order):
@@ -57,47 +55,73 @@ def Initialize(graph, order):
             order.remove(each)
     return score
 
-def MaxIncoming(score, node, graph, weight):
+def MaxIncoming(score, node, graph, weight, backtrack):
     max_score = 0
     for eachnode in graph[(node, "in")]:
-        new_score = score[eachnode] + weight[(eachnode, node)]
+        try:
+            new_score = score[eachnode] + weight[(eachnode, node)]
+        except:
+            print "eachnode:", eachnode, ", node", node
+            print graph[(node, "in")]
+            raise KeyError()
         if max_score < new_score:
             max_score = new_score
+            backtrack[node] = eachnode
     return max_score
 
 def AccessibleNodes(graph, start):
     access = []
     nodeleft = [start]
-    print graph
     while nodeleft:
         nextnode = nodeleft.pop()
         access.append(nextnode)
         child_nodes = graph[nextnode,"out"]
-        print child_nodes
         nodeleft += child_nodes
-    print "access,", access
-    return access
+    return list(set(access))
+
+def Trace(backtrack, start, end):
+    track = [end]
+    next_node = backtrack[end]
+    while next_node:
+        track.append(next_node)
+        if next_node == start:
+            break
+        else:
+            next_node = backtrack[next_node]
+    track.reverse()
+    return track
+
+def TrimGraph(graph, accessible):
+    for node in accessible:
+        newout = [ eachout for eachout in graph[(node, "out")] if eachout in accessible]
+        graph[(node, "out")] = newout
+        newin = [ eachin for eachin in graph[(node, "in")] if eachin in accessible]
+        graph[(node, "in")] = newin
 
 def DAG(graph, start, end, weight):
     accessible = AccessibleNodes(graph, start)
     order = TopologicalSorting(graph)
     order = [x for x in order if x in accessible]
     score = Initialize(graph, order)
+    print accessible
+    backtrack = dict()
+    TrimGraph(graph, accessible)
     for node in order:
-        score[node] = MaxIncoming(score, node, graph, weight)
-    return score
+        score[node] = MaxIncoming(score, node, graph, weight, backtrack)
+    print int(score[end])
+    print "->".join(Trace(backtrack, start, end))
+    return score, backtrack
 
 def test():
     infile  = "tmp"
+    infile  = "/home/ajing/Downloads/dataset_74_7.txt"
     content = [ x.strip() for x in open(infile).readlines() ]
     start   = content[0]
     end     = content[1]
     graph, weight_dict = ParseGraph(content[2:])
-    print graph
     #print NoIncommingNodes(graph)
-    print TopologicalSorting(graph)
-    print graph
-    print DAG(graph, start, end, weight_dict)
+    #print TopologicalSorting(graph)
+    DAG(graph, start, end, weight_dict)
 
 if __name__ == "__main__":
     test()
