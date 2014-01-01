@@ -5,19 +5,12 @@ Solve the Fitting Alignment Problem.
 '''
 
 import numpy as np
+#np.set_printoptions(threshold=np.nan)
 
 gap_score = 1
 
 def MaxScore(v, w, i, j, score, backtrack):
     maxscore = -10000
-    # match or mismatch
-    if v[i - 1] == w[j - 1]:
-        newscore = score[i - 1, j - 1] + 1
-    else:
-        newscore = score[i - 1, j - 1] - 1
-    if newscore > maxscore:
-        backtrack[i, j] = 3
-        maxscore = newscore
     # w is gap
     newscore = score[i, j - 1]  - gap_score
     if newscore > maxscore:
@@ -28,6 +21,14 @@ def MaxScore(v, w, i, j, score, backtrack):
     if newscore > maxscore:
         backtrack[i, j] = 1
         maxscore = newscore
+    # match or mismatch
+    if v[i - 1] == w[j - 1]:
+        newscore = score[i - 1, j - 1] + 1
+    else:
+        newscore = score[i - 1, j - 1] - 1
+    if newscore > maxscore:
+        backtrack[i, j] = 3
+        maxscore = newscore
     return maxscore
 
 def ScoreInitialize(score):
@@ -37,11 +38,12 @@ def ScoreInitialize(score):
         score[0, j] = - j * gap_score
 
 def FindMaximunRow(score):
-    indexlist = np.where(score[:,-1] == score[-1,-1])
+    indexlist = np.where(score[:,-1] == np.amax(score[:,-1]))
     return indexlist[0][0]
 
 def PrintBacktrack( score, backtrack, v, w):
     i = FindMaximunRow(score)
+    #print "i", i
     j = len(w)
     matchlist = []
     # first w
@@ -73,7 +75,7 @@ def PrintBacktrack( score, backtrack, v, w):
     print secondstring[leftindex:rightindex]
 
 
-def GlobalAlign(v, w):
+def LocalAlign(v, w):
     # v and w are two sequences
     v_len = len(v)
     w_len = len(w)
@@ -86,13 +88,14 @@ def GlobalAlign(v, w):
             score[i, j] = MaxScore(v, w, i, j, score, backtrack)
     print int(np.amax(score[:,-1]))
     #print score
+    #print score[:,-1]
     PrintBacktrack( score, backtrack, v, w)
 
 if __name__ == "__main__":
     v = "GTAGGCTTAAGGTTA"
     w = "TAGATA"
-    v = "AAATTTAAA"
-    w = "TATA"
+    #v = "AAATTTAAA"
+    #w = "TATA"
     #v = "AAAAAAAAAAAATTATAA"
     #w = "TTT"
     infile  = "/home/ajing/Downloads/dataset_77_5.txt"
@@ -100,4 +103,4 @@ if __name__ == "__main__":
     v, w = [ x.strip() for x in open(infile).readlines() ]
     #print v
     #print w
-    GlobalAlign(v, w)
+    LocalAlign(v, w)
