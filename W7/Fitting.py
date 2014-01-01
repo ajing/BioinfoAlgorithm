@@ -10,16 +10,6 @@ gap_score = 1
 
 def MaxScore(v, w, i, j, score, backtrack):
     maxscore = -10000
-    # v is gap
-    newscore = score[i - 1, j]  - gap_score
-    if newscore > maxscore:
-        backtrack[i, j] = 1
-        maxscore = newscore
-    # w is gap
-    newscore = score[i, j - 1]  - gap_score
-    if newscore > maxscore:
-        backtrack[i, j] = 2
-        maxscore = newscore
     # match or mismatch
     if v[i - 1] == w[j - 1]:
         newscore = score[i - 1, j - 1] + 1
@@ -27,6 +17,16 @@ def MaxScore(v, w, i, j, score, backtrack):
         newscore = score[i - 1, j - 1] - 1
     if newscore > maxscore:
         backtrack[i, j] = 3
+        maxscore = newscore
+    # w is gap
+    newscore = score[i, j - 1]  - gap_score
+    if newscore > maxscore:
+        backtrack[i, j] = 2
+        maxscore = newscore
+    # v is gap
+    newscore = score[i - 1, j]  - gap_score
+    if newscore > maxscore:
+        backtrack[i, j] = 1
         maxscore = newscore
     return maxscore
 
@@ -45,17 +45,20 @@ def PrintBacktrack( score, backtrack, v, w):
     j = len(w)
     matchlist = []
     # first w
-    while i > 0 or j > 0:
-        if backtrack[i, j] == 3:
-            matchlist.append([v[i - 1], w[j - 1]])
+    while j > 0:
+        if backtrack[i, j] == 1:
+            # up
+            matchlist.append([v[i - 1], "-"])
             i -= 1
-            j -= 1
         elif backtrack[i, j] == 2:
+            # left
             matchlist.append(["-", w[j - 1]])
             j -= 1
         else:
-            matchlist.append([v[i - 1], "-"])
+            # diagnal
+            matchlist.append([v[i - 1], w[j - 1]])
             i -= 1
+            j -= 1
     matchlist.reverse()
     firstline = []
     secondline = []
@@ -81,18 +84,20 @@ def GlobalAlign(v, w):
     for i in range(1, 1 + v_len):
         for j in range(1, 1 + w_len):
             score[i, j] = MaxScore(v, w, i, j, score, backtrack)
-    print int(np.amax(score))
-    print score
+    print int(np.amax(score[:,-1]))
+    #print score
     PrintBacktrack( score, backtrack, v, w)
 
 if __name__ == "__main__":
     v = "GTAGGCTTAAGGTTA"
     w = "TAGATA"
-    #v = "AAATTTAAA"
-    #w = "TATA"
-    #infile  = "/home/ajing/Downloads/dataset_77_5.txt"
+    v = "AAATTTAAA"
+    w = "TATA"
+    #v = "AAAAAAAAAAAATTATAA"
+    #w = "TTT"
+    infile  = "/home/ajing/Downloads/dataset_77_5.txt"
     #infile  = "tmp"
-    #v, w = [ x.strip() for x in open(infile).readlines() ]
+    v, w = [ x.strip() for x in open(infile).readlines() ]
     #print v
     #print w
     GlobalAlign(v, w)
