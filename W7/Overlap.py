@@ -1,16 +1,23 @@
 '''
-Solve the Fitting Alignment Problem.
-    Input: Two nucleotide strings v and w, where v has length at most 1000 and w has length at most 100.
-    Output: A highest-scoring fitting alignment between v and w. Use the simple scoring method in which matches count +1 and both the mismatch and indel penalties are 1.
+Solve the Overlap Alignment Problem.
+    Input: Two strings v and w, each of length at most 1000.
+    Output: The score of an optimal overlap alignment of v and w, followed by an alignment of a suffix v' of v and a prefix w of w achieving this maximum score. Use an alignment score in which matches count +1 and both the mismatch and indel penalties are 2.
 '''
 
 import numpy as np
-#np.set_printoptions(threshold=np.nan)
 
-gap_score = 1
+gap_score = 2
 
 def MaxScore(v, w, i, j, score, backtrack):
     maxscore = -10000
+    # match or mismatch
+    if v[i - 1] == w[j - 1]:
+        newscore = score[i - 1, j - 1] + 1
+    else:
+        newscore = score[i - 1, j - 1] - 2
+    if newscore > maxscore:
+        backtrack[i, j] = 3
+        maxscore = newscore
     # w is gap
     newscore = score[i, j - 1]  - gap_score
     if newscore > maxscore:
@@ -21,30 +28,16 @@ def MaxScore(v, w, i, j, score, backtrack):
     if newscore > maxscore:
         backtrack[i, j] = 1
         maxscore = newscore
-    # match or mismatch
-    if v[i - 1] == w[j - 1]:
-        newscore = score[i - 1, j - 1] + 1
-    else:
-        newscore = score[i - 1, j - 1] - 1
-    if newscore > maxscore:
-        backtrack[i, j] = 3
-        maxscore = newscore
     return maxscore
 
-def ScoreInitialize(score):
-    # add penalty score for each side
-    rownum, colnum = score.shape
-    for j in range(colnum):
-        score[0, j] = - j * gap_score
-
-def FindMaximunRow(score):
-    indexlist = np.where(score[:,-1] == np.amax(score[:,-1]))
+def FindMaximunColumn(score):
+    indexlist = np.where(score[-1, :] == np.amax(score[-1, :]))
     return indexlist[0][0]
 
 def PrintBacktrack( score, backtrack, v, w):
-    i = FindMaximunRow(score)
-    #print "i", i
-    j = len(w)
+    i = len(v)
+    j = FindMaximunColumn(score)
+    #print "j", j
     matchlist = []
     # first w
     while j > 0:
@@ -69,10 +62,8 @@ def PrintBacktrack( score, backtrack, v, w):
         secondline.append(matchlist[i][1])
     firststring  = "".join(firstline)
     secondstring = "".join(secondline)
-    leftindex   = secondstring.index(w[0])
-    rightindex  = secondstring.rindex(w[-1]) + 1
-    print firststring[leftindex:rightindex]
-    print secondstring[leftindex:rightindex]
+    print firststring
+    print secondstring
 
 
 def LocalAlign(v, w):
@@ -80,7 +71,6 @@ def LocalAlign(v, w):
     v_len = len(v)
     w_len = len(w)
     score = np.zeros([v_len + 1, w_len + 1])
-    ScoreInitialize(score)
     # 1 is | (down); 2 is -> left; 3 is \ diag
     backtrack = np.zeros([v_len + 1, w_len + 1])
     for i in range(1, 1 + v_len):
@@ -92,13 +82,9 @@ def LocalAlign(v, w):
     PrintBacktrack( score, backtrack, v, w)
 
 if __name__ == "__main__":
-    v = "GTAGGCTTAAGGTTA"
-    w = "TAGATA"
-    #v = "AAATTTAAA"
-    #w = "TATA"
-    #v = "AAAAAAAAAAAATTATAA"
-    #w = "TTT"
-    infile  = "/home/ajing/Downloads/dataset_77_5.txt"
+    v = "PAWHEAE"
+    w = "HEAGAWGHEE"
+    infile  = "/home/ajing/Downloads/dataset_77_7.txt"
     #infile  = "tmp"
     v, w = [ x.strip() for x in open(infile).readlines() ]
     #print v
