@@ -59,20 +59,31 @@ def PrintBacktrack(backtrack, v, w):
     j = len(w)
     matchlist = []
     nextnode = ("middle", i, j)
+    # generate i,j list
+    ijlist = []
+    alllist = []
     while True:
-        print nextnode
-        if nextnode[0] == "upper":
-            matchlist.append(["-", w[j - 1]])
-        elif nextnode[0] == "lower":
-            matchlist.append([v[i - 1], "-"])
-        else:
-            matchlist.append([v[i - 1], w[j - 1]])
+        alllist.append([i, j])
+        if i == 0 and j == 0:
+            break
+        if not [i, j] in ijlist:
+            ijlist.append([i, j])
         nextnode = backtrack[nextnode]
         i = nextnode[1]
         j = nextnode[2]
-        if i == 0 and j == 0:
-            break
-    matchlist.reverse()
+    ijlist.reverse()
+    old_i = 0
+    old_j = 0
+    for each in ijlist:
+        i, j = each
+        if i == (old_i + 1) and j == (old_j + 1):
+            matchlist.append([v[i - 1], w[j - 1]])
+        if i == old_i and j == (old_j + 1):
+            matchlist.append(["-", w[j - 1]])
+        if i == (old_i + 1) and j == old_j:
+            matchlist.append([v[i - 1], "-"])
+        old_i = i
+        old_j = j
     firstline = []
     secondline = []
     for i in range(len(matchlist)):
@@ -116,9 +127,6 @@ def AffineGap(v, w):
     for i in range(1, 1 + v_len):
         for j in range(1, 1 + w_len):
             MaxScore(v, w, i, j, lower, middle, upper, backtrack, dmatrix)
-    print "middle", middle
-    print "lower", lower
-    print "upper", upper
     print int(np.amax(middle))
     #print score
     #print score[:,-1]
@@ -127,4 +135,7 @@ def AffineGap(v, w):
 if __name__ == "__main__":
     v = "PRTEINS"
     w = "PRTWPSEIN"
+    #infile  = "tmp"
+    infile  = "/home/ajing/Downloads/dataset_78_8.txt"
+    v, w = [ x.strip() for x in open(infile).readlines() ]
     AffineGap(v, w)
