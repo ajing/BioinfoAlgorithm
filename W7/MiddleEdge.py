@@ -8,6 +8,7 @@ from AffineGap import ParseMatrix
 
 BLOSUM = "BLOSUM62.txt"
 gap_score = 5
+dmatrix = ParseMatrix(BLOSUM)
 
 def LastColumnScore(v, w, dmatrix):
     v_len = len(v)
@@ -30,36 +31,53 @@ def LastColumnScore(v, w, dmatrix):
         # renew column 0
         for i in range(v_len + 1):
             two_column_score[i, 0] = two_column_score[i, 1]
-    return two_column_score, backtrack
+    return two_column_score[:,1], backtrack
 
-def MiddleEdge(v, w):
-    dmatrix = ParseMatrix(BLOSUM)
+def GetMaxScore(v, w):
     w_len = len(w)
     fromsource, backtrack = LastColumnScore(v, w[:w_len/2], dmatrix)
-    print "fromsource", fromsource
-    tosink, backtrack = LastColumnScore(v[::-1], w[w_len/2::-1], dmatrix)
+    tosink, backtrack = LastColumnScore(v[::-1], w[w_len/2:][::-1], dmatrix)
     tosink = tosink[::-1]
-    print "tosink", tosink
     length = fromsource + tosink
-    print "length", length
+    print int(max(length))
+
+def MiddleEdge(v, w):
+    w_len = len(w)
+    v_len = len(v)
+    fromsource, backtrack = LastColumnScore(v, w[:w_len/2], dmatrix)
+    tosink, backtrack = LastColumnScore(v[::-1], w[w_len/2:][::-1], dmatrix)
+    tosink = tosink[::-1]
+    backtrack = backtrack[::-1]
+    length = fromsource + tosink
     middle_start_x = w_len/2
     middle_start_y = length.argmax(axis = 0)
-    print middle_start_y
-    middle_end_x   = middle_start_x + 1
-    middle_end_y   = backtrack[middle_start_y]
-    print (middle_start_x, middle_start_y), (middle_end_x, middle_end_y)
+    middle_end_x   = w_len - backtrack[middle_start_y][1]
+    middle_end_y   = v_len - backtrack[middle_start_y][0]
+    return (middle_start_y, middle_start_x), (middle_end_y, middle_end_x)
 
 def test():
     v = "PLEASANTLY"
     w = "MEASNLY"
+    w_len = len(w)
     dmatrix = ParseMatrix(BLOSUM)
-    LastColumnScore(v, w, dmatrix)
+    sourceright = [-15., -11.,  -7.,  -3.,   6.,   1.,  -4.,  -9., -14., -19., -24.]
+    tosinkright = [ -9.,  -4.,   1.,   6.,  11.,  13.,  12.,   7.,   1.,  -8., -20.]
+    fromsource, backtrack = LastColumnScore(v, w[:w_len/2], dmatrix)
+    tosink, backtrack = LastColumnScore(v[::-1], w[w_len/2:][::-1], dmatrix)
+    tosink = tosink[::-1]
+    assert(all(fromsource == sourceright))
+    assert(all(tosink == tosinkright))
+    print MiddleEdge(v, w)
+
+def main():
+    infile  = "tmp"
+    infile  = "/home/ajing/Downloads/dataset_79_12.txt"
+    v, w = [ x.strip() for x in open(infile).readlines() ]
+    '''
+    v = "PLEASANTLY"
+    w = "MEASNLY"
+    '''
     MiddleEdge(v, w)
 
 if __name__ == "__main__":
     test()
-    '''
-    v = "PLEASANTLY"
-    w = "MEASNLY"
-    MiddleEdge(v, w)
-    '''
