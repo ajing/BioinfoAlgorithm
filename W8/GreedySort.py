@@ -40,6 +40,14 @@ class P:
         else:
             self.p[(i - 1) : j] = -self.p[(i - 1) : j][::-1]
 
+    def breakpointedges(self):
+        edges = []
+        for i in range(len(self.p) - 1):
+            pair = self.p[i:(i + 2)]
+            edges.append([pair[0], -pair[1]])
+        edges.append([self.p[-1], -self.p[0]])
+        return edges
+
 def testP():
     newp = P([1,-2,3])
     print newp
