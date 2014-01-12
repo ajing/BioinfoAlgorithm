@@ -93,11 +93,11 @@ def GlobalAlign(v, w):
 
 if __name__ == "__main__":
     v = "PLEASANTLY"
-    w = "MEANLY"
+    w = "MEASNLY"
     #v = "TNIYGLKERVPR"
     #w = "TNNMQTRMWCVLIAAPCHLW"
-    infile  = "/home/ajing/Downloads/dataset_76_3.txt"
-    v, w = [ x.strip() for x in open(infile).readlines() ]
+    #infile  = "/home/ajing/Downloads/dataset_76_3.txt"
+    #v, w = [ x.strip() for x in open(infile).readlines() ]
     #print v
     #print w
     GlobalAlign(v, w)
