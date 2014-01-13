@@ -12,21 +12,13 @@ def IndexSame(string1, string2):
 
 def MatchEdge( eachc, suffixtree, startnode):
     max_len = 0
-    max_key = ""
-    if startnode >= len(suffixtree):
-        print "startnode is too large"
-        return False
+    max_key = False
     for eachkey in suffixtree[startnode]:
-        print eachkey
         index = IndexSame(eachkey, eachc)
-        print index
         if  index > max_len:
             max_key = eachkey
             max_len = index
-    if max_key:
-        return max_key
-    else:
-        return False
+    return max_key
 
 def CurrentID():
     CurrentID.ID += 1
@@ -34,58 +26,63 @@ def CurrentID():
 CurrentID.ID = 1
 
 def FindCommonPrefix(pattern, stree):
-    print "pattern:", pattern
     startnode = 1
-    startold  = 0
+    startold  = startnode
     matched_s = False
     matched_old = False
+    pattern_old = pattern
     while pattern:
         matched_old = matched_s
         matched_s = MatchEdge(pattern, stree, startnode)
-        print "before:match:", matched_s, "pattern:", pattern
         if matched_s:
             index   = IndexSame(matched_s, pattern)
+            pattern_old = pattern
             pattern = pattern[index:]
             startold = startnode
             startnode, index = stree[startnode][matched_s]
         else:
-            return pattern, startold, matched_old
-        print "after:match:", matched_s, "pattern:", pattern
+            return pattern_old, startold, matched_old
 
 def ExtendSuffixTree(pattern_left, ematched, stree, matchnode, i):
     branch = stree[matchnode]
-    print "ematched", ematched
     if ematched:
         # two new nodes with two new edges and one modified edge
         index = IndexSame(pattern_left, ematched)
-        branch[ematched[index:]] = [ new_v, i ]
         new_v = CurrentID()
         stree.append({})
         new_w = CurrentID()
-        print "new_w", new_w
         stree.append({"!":i})
-        stree[new_v][ematched[:index]] = branch[ematched]
+        branch[ematched[:index]] = [ new_v, i ]
+        stree[new_v][ematched[index:]] = branch[ematched]
         stree[new_v][pattern_left[index:]] = [ new_w, i]
         del branch[ematched]
     else:
         new_v = CurrentID()
         stree.append({"!":i})
         branch[pattern_left] = [ new_v, i]
-    print pattern_left, ematched, branch
+
+def PrintSuffix(suffixtree):
+    edge_list = []
+    for eachnode in suffixtree:
+        edges = [x for x in eachnode.keys() if x != "!"]
+        edge_list += edges
+    print "\n".join(edge_list)
 
 def BuildSuffixTree(text):
     # suffix tree is like [0, {"CTG":(nextnode, startindex), "A"}, {}]
-    patterns = [text[i:] + "$" for i in range(len(text))]
+    patterns = [text[i:] for i in range(len(text))]
     suffixtree = [{},{}]
     for i in range(len(patterns)):
         eachp  = patterns[i]
+        print eachp
         patternleft, nodematched, edgematched = FindCommonPrefix(eachp, suffixtree)
-        print "nodematch:",nodematched
         ExtendSuffixTree( patternleft, edgematched, suffixtree, nodematched, i)
-        print "suffixtree:", suffixtree
+    return suffixtree
 
 def test():
-    BuildSuffixTree("ATAAATG")
+    suftree = BuildSuffixTree("ATAAA$")
+    print suftree
+    PrintSuffix(suftree)
 
 
 if __name__ == "__main__":
