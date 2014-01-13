@@ -41,6 +41,7 @@ def FindCommonPrefix(pattern, stree):
             startold = startnode
             startnode, index = stree[startnode][matched_s]
         else:
+            print "pattern_old:", pattern_old, startold, matched_old
             return pattern_old, startold, matched_old
 
 def ExtendSuffixTree(pattern_left, ematched, stree, matchnode, i):
