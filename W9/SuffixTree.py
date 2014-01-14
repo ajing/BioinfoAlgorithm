@@ -13,43 +13,46 @@ def IndexSame(string1, string2):
             return i
 
 def MatchEdge( eachc, suffixtree, startnode):
-    max_ind = 0
-    max_key = False
     for eachkey in suffixtree[startnode]:
-        index = IndexSame(eachkey, eachc)
-        if  index > max_ind:
-            max_key = eachkey
-            max_ind = index
-    return max_key
+        if eachc.startswith(eachkey):
+            return eachkey
 
 def CurrentID():
     CurrentID.ID += 1
     return CurrentID.ID
 
 def FindCommonPrefix(pattern, stree):
+    original  = pattern
     startnode = 1
-    startold  = startnode
     matched_s = False
-    matched_old = False
-    pattern_old = pattern
     while pattern:
-        matched_old = matched_s
         matched_s = MatchEdge(pattern, stree, startnode)
         if matched_s:
-            index   = IndexSame(matched_s, pattern)
-            pattern_old = pattern
+            index   = len(matched_s)
             pattern = pattern[index:]
-            startold = startnode
             startnode, index = stree[startnode][matched_s]
         else:
-            #print "pattern_old:", pattern_old, startold, matched_old
-            if matched_old in stree[startnode]:
-                return pattern, startnode, matched_s
-            else:
-                return pattern_old, startold, matched_old
+            return pattern, startnode
+    #print "original:", original
+    #print "previous:", pattern_old, startold, matched_old
+    #print "after:", pattern, startnode, matched_s
+    return pattern, startnode
 
-def ExtendSuffixTree(pattern_left, ematched, stree, matchnode, i):
+def FindSimilarEdge(branch, pattern):
+    max_edge = ""
+    max_len    = 0
+    for eachedge in branch:
+        i = IndexSame(eachedge, pattern)
+        if i > max_len:
+            max_edge = eachedge
+            max_len  = i
+    return max_edge
+
+def ExtendSuffixTree(pattern_left, stree, matchnode, i, pattern):
+    # static variable
     branch = stree[matchnode]
+    ematched = FindSimilarEdge(branch, pattern_left)
+    p_len = len(pattern)
     if ematched:
         # two new nodes with two new edges and one modified edge
         index = IndexSame(pattern_left, ematched)
@@ -59,6 +62,10 @@ def ExtendSuffixTree(pattern_left, ematched, stree, matchnode, i):
         stree.append({"!":i})
         #print "branch", branch
         branch[ematched[:index]] = [ new_v, i ]
+        node_len = p_len - len(pattern_left) + index
+        if node_len > ExtendSuffixTree.maxshared:
+            ExtendSuffixTree.maxshared = node_len
+            ExtendSuffixTree.maxpattern = pattern[:node_len]
         stree[new_v][ematched[index:]] = branch[ematched]
         stree[new_v][pattern_left[index:]] = [ new_w, i]
         del branch[ematched]
@@ -78,27 +85,47 @@ def PrintSuffix(suffixtree):
 def BuildSuffixTree(text):
     # initialize the first id
     CurrentID.ID = 1
+    ExtendSuffixTree.maxshared = 0
+    ExtendSuffixTree.maxpattern = ""
     # suffix tree is like [0, {"CTG":(nextnode, startindex), "A"}, {}]
     patterns = [text[i:] for i in range(len(text))]
     suffixtree = [{},{}]
     for i in range(len(patterns)):
         eachp  = patterns[i]
         #print "eachp:", eachp
-        patternleft, nodematched, edgematched = FindCommonPrefix(eachp, suffixtree)
-        ExtendSuffixTree( patternleft, edgematched, suffixtree, nodematched, i)
+        patternleft, nodematched = FindCommonPrefix(eachp, suffixtree)
+        #print patternleft, nodematched
+        ExtendSuffixTree( patternleft, suffixtree, nodematched, i, eachp)
         #print "suffixtree:", suffixtree
     return suffixtree
 
 def test():
-    suftree = BuildSuffixTree("ATAAA$")
-    print suftree
-    PrintSuffix(suftree)
+    #suftree = BuildSuffixTree("ATAAA$")
+    #print suftree
+    #PrintSuffix(suftree)
     #print IndexSame("A", "AA")
+    suftree = BuildSuffixTree("ABCDBCD$")
+    print "maxpattern:", ExtendSuffixTree.maxpattern
+    #PrintSuffix(suftree)
+    suftree = BuildSuffixTree("ABCABAB$")
+    print "maxpattern:", ExtendSuffixTree.maxpattern
+    suftree = BuildSuffixTree("ATATCGTTTTATCGTT$")
+    print "maxpattern:", ExtendSuffixTree.maxpattern
+    #print suftree
+    #PrintSuffix(suftree)
 
+
+def mainLongPattern(text):
+    BuildSuffixTree(text)
+    print ExtendSuffixTree.maxpattern
 
 if __name__ == "__main__":
-    #test()
-    infile   = "/home/ajing/Downloads/dataset_93_3.txt"
-    text = open(infile).readlines()[0].strip()
-    stree = BuildSuffixTree(text)
-    PrintSuffix(stree)
+    '''
+    test()
+    '''
+    infile   = "/home/ajing/Downloads/dataset_94_8.txt"
+    #infile   = "tmp2"
+    text = open(infile).readlines()[0].strip() + "$"
+    #stree = BuildSuffixTree(text)
+    #PrintSuffix(stree)
+    mainLongPattern(text)

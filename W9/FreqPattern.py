@@ -1,6 +1,7 @@
 '''
+## This file is obsolete because too slow. The FreqPattern part has become a part of SuffixTree file
 '''
-
+# matchedge has been modified!!!!!!!!!!!!!1
 from SuffixTree import BuildSuffixTree, MatchEdge, IndexSame
 
 def PatternInTree(pattern, stree):
@@ -12,11 +13,13 @@ def PatternInTree(pattern, stree):
             pattern = pattern[index:]
             startnode, index = stree[startnode][matched_s]
         else:
+            for key in stree[startnode][]
             return False
     return True
 
 def PatternGenerator(text, n):
     for i in range(len(text) - n + 1):
+        print i
         yield text[i:n + i]
 
 def FreqPatternExist(text, n):
@@ -59,6 +62,6 @@ def test():
 
 if __name__ == "__main__":
     #test()
-    infile   = "/home/ajing/Downloads/dataset_93_3.txt"
+    infile   = "tmp"
     text = open(infile).readlines()[0].strip()
     print FreqCheat(text)
