@@ -8,8 +8,7 @@ def SuffixArray(text):
     # text is ended with $
     if text[-1] != "$":
         text += "$"
-    suffix = [ text[i:] for i in range(len(text))]
-    sarray  = sorted(range(len(text)), key = lambda i: suffix[i])
+    sarray  = sorted(range(len(text)), key = lambda i: text[i:])
     print ", ".join([str(x) for x in sarray])
 
 def test():
