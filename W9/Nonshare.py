@@ -10,7 +10,12 @@ def FindNonShared(string1, string2):
     suffixtree = BuildSuffixTree(string1 + "$")
     #print suffixtree
     for i in range(2, len(string2) + 1):
+        existing = []
         for pattern in PatternGenerator(string2, i):
+            if pattern in existing:
+                continue
+            else:
+                existing.append(pattern)
             if not PatternInTree(pattern, suffixtree):
                 return pattern
 
@@ -22,7 +27,7 @@ if __name__ == "__main__":
     '''
     test()
     '''
-    infile   = "/home/ajing/Downloads/dataset_95_6.txt"
+    infile   = "dataset_95_6.txt"
     #infile   = "tmp2"
     string1, string2 = [ x.strip() for x in open(infile).readlines()]
     print FindNonShared(string1, string2)
