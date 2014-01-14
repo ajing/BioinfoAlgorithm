@@ -13,13 +13,14 @@ def PatternInTree(pattern, stree):
             pattern = pattern[index:]
             startnode, index = stree[startnode][matched_s]
         else:
-            for key in stree[startnode][]
+            for key in stree[startnode]:
+                if key.startswith(pattern):
+                    return True
             return False
     return True
 
 def PatternGenerator(text, n):
     for i in range(len(text) - n + 1):
-        print i
         yield text[i:n + i]
 
 def FreqPatternExist(text, n):
