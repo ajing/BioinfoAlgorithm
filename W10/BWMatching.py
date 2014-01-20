@@ -14,11 +14,9 @@ def BWMatching(firstcolumn, lastcolumn, pattern, last2first):
             symbol = pattern[-1]
             pattern = pattern[:-1]
             last_short = lastcolumn[top : (bottom + 1)]
-            print symbol, pattern, last_short
             if symbol in last_short:
                 topIndex  = last_short.index(symbol) + top
-                lastIndex = len(last_short) - last_short[::-1].index(symbol) + top + 1
-                print topIndex, lastIndex
+                lastIndex = len(last_short) - last_short[::-1].index(symbol) + top - 1
                 top    = last2first[topIndex]
                 bottom = last2first[lastIndex]
             else:
@@ -32,6 +30,7 @@ def main(bwt, patterns):
     num_matchs = []
     for eachp in patterns:
         num_matchs.append(BWMatching(firstcol, bwt, eachp, last2first))
+    print " ".join(map(str, num_matchs))
 
 def test():
     bwt = "TCCTCTATGAGATCCTATTCTATGAAACCTTCA$GACCAAAATTCTCCGGC"
@@ -39,4 +38,10 @@ def test():
     main(bwt, patterns)
 
 if __name__ == "__main__":
-    test()
+    #test()
+    infile   = "/home/ajing/Downloads/dataset_100_8.txt"
+    #infile   = "tmp"
+    text, patterns = [ x.strip() for x in open(infile).readlines()]
+    patterns = patterns.split()
+    #print text, patterns
+    main(text, patterns)
