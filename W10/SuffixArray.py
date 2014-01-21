@@ -14,14 +14,16 @@ def PrintSuffixArray(su_array):
 
 def test():
     bwt = "PANAMABANANAS$"
-    sarray = SuffixArray(bwt, 5)
+    sarray = SuffixArray(bwt, 1)
     PrintSuffixArray(sarray)
 
 if __name__ == "__main__":
-    #test()
+    test()
+    '''
     infile   = "/home/ajing/Downloads/dataset_102_3.txt"
     #infile   = "tmp"
     text, multi = [ x.strip() for x in open(infile).readlines()]
     multi    = int(multi)
     sarray   = SuffixArray(text, multi)
     PrintSuffixArray(sarray)
+    '''

@@ -37,9 +37,9 @@ def BetterBWMatching(firstoccur, lastcolumn, pattern, countdict):
                 top    = firstoccur[symbol] + countdict[symbol][top]
                 bottom = firstoccur[symbol] + countdict[symbol][bottom + 1] - 1
             else:
-                return 0
+                return False, False
         else:
-            return bottom - top + 1
+            return top, bottom
 
 def main(bwt, patterns):
     firstcol = sorted(bwt)
@@ -47,7 +47,8 @@ def main(bwt, patterns):
     count_dict  = CreateCountDict(bwt)
     num_matchs = []
     for eachp in patterns:
-        num_matchs.append(BetterBWMatching(first_occur, bwt, eachp, count_dict))
+        top, bottom = BetterBWMatching(first_occur, bwt, eachp, count_dict)
+        num_matchs.append(bottom - top + 1)
     print " ".join(map(str, num_matchs))
 
 def test():
