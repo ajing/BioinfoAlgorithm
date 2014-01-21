@@ -13,11 +13,9 @@ def GetRE(pattern, d):
 def MultipleApproxPatternMatch(text, patterns, d):
     all_matched_index = []
     for eachp in patterns:
-        matched_index = []
         reg = GetRE(eachp, d)
         for m in regex.finditer(reg, text, overlapped = True):
-            matched_index.append(m.start())
-        all_matched_index += matched_index
+            all_matched_index.append(m.start())
     all_matched_index.sort()
     print " ".join(map(str, all_matched_index))
 
@@ -32,10 +30,10 @@ if __name__ == "__main__":
     test()
     '''
     infile   = "tmp"
-    #infile   = "/home/ajing/Downloads/dataset_103_4.txt"
+    infile   = "/home/ajing/Downloads/dataset_104_6.txt"
     content = [ x.strip() for x in open(infile).readlines()]
     text    = content[0]
-    patterns= content[1]
+    patterns= content[1].split()
     d = int(content[2])
-    print patterns, d
+    #print patterns, d
     MultipleApproxPatternMatch(text, patterns, d)
